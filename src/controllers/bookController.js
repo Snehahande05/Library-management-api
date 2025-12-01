@@ -14,9 +14,9 @@ getAllBooks = async (request, response) => {
 getBookById = async (request, response) => {
     try{
     const book = await Book.findById(request.params.id);
-    if(!book){{
+    if(!book){
         return response.status(404).json({message:"Book not found"});
-    }}
+    }
     response.status(200).json(book);
     }catch(error){
         response.status(500).json({message:error.message});
@@ -32,7 +32,6 @@ createBook = async (request, response) => {
     }
 
     const newBook = {
-        id:books.length+1,
         title,
         author,
         publishedYear,
@@ -41,35 +40,31 @@ createBook = async (request, response) => {
         status:"Available"
     };
 
-    const book=new Book(newBook);
+    const book = new Book(newBook);
     await book.save();
+    response.status(201).json({message:"Book created successfully",data:book});
 
     }catch(error){
-        response.status(500).json({message:"Book created successfully",data:newBook});
+        response.status(500).json({message:error.message});
     }
 };
 
 updateBook = async (request, response) => {
     try{
-    const book = await Book.findByIdAndUpdate(request.params.id, request.body, {new:true});
-    if(!book){{
-        return response.status(404).json({message:"Book not found"});
-    }}
-     
     const {title, author, publishedYear, price, quantity} = request.body;
 
     if(!title || !author || !publishedYear || !price || !quantity){
         return response.status(400).json({message:"Please provide all the required fields"});
     }
 
-    book.title = title;
-    book.author = author;
-    book.publishedYear = publishedYear;
-    book.price = price;
-    book.quantity = quantity;
+    const book = await Book.findByIdAndUpdate(request.params.id, request.body, {new:true});
+    if(!book){
+        return response.status(404).json({message:"Book not found"});
+    }
+     
     response.status(200).json({message:"Book updated successfully",data:book});
 
-}catch(error){
+    }catch(error){
         response.status(500).json({message:error.message});
     }
 };
@@ -82,7 +77,7 @@ deleteBook = async (request, response) => {
     }
     response.status(200).json({message:"Book deleted successfully"});
 
-}catch(error){
+    }catch(error){
         response.status(500).json({message:error.message});
     }
 };

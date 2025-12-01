@@ -29,7 +29,7 @@ const issueBookSchema = {
 
     returnDate: {
         type: Date,
-        deafult: Date.now
+        default: Date.now
     },
 
     status: {
